@@ -1,0 +1,31 @@
+---
+- name: Deploying Application to Kubernetes
+  hosts: localhost
+  gather_facts: false
+  vars:
+    kubeconfig_file: ~/.kube/config
+    namespace_name: default
+   
+  tasks:
+    - name: Create Deployment
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_file }}"
+        state: present
+        src: deployment.yaml
+        namespace: "{{ namespace_name }}"
+      register: deployment_output
+    - name: Deployment Output
+      debug:
+        var: deployment_output
+
+    - name: LB Service
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_file }}"
+        state: present
+        src: service.yaml
+        namespace: "{{ namespace_name }}"
+      register: service_output
+    - name: Service Output
+      debug:
+        var: service_output
+

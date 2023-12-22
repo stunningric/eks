@@ -1,0 +1,35 @@
+---
+- name: Delete Deployment and Service
+  hosts: localhost
+  gather_facts: false
+  vars:
+    kubeconfig_file: ~/.kube/config
+    namespace_name: default
+  tasks:
+    - name: Delete Deployment
+      kubernetes.core.k8s:
+        state: absent
+        kind: Deployment
+        name: nginx
+        namespace: "{{namespace_name}}"
+        kubeconfig: "{{kubeconfig_file}}"
+        wait: true
+        wait_condition:
+          status: False #wait for status to be false
+        wait_sleep: 2  #check every 2 secs
+      register: deletedep_output
+    - name: deletedep Output
+      debug:
+        var: deletedep_output
+
+    - name: Delete Service
+      kubernetes.core.k8s:
+        state: absent
+        kind: Service
+        name: nginx
+        namespace: "{{namespace_name}}"
+        kubeconfig: "{{kubeconfig_file}}"
+      register: deletesvr_output
+    - name: deletesvr Output
+      debug:
+        var: deletesvr_output
